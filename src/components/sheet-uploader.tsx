@@ -87,7 +87,7 @@ export function SheetUploader() {
 
     try {
       const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data);
+      const workbook = XLSX.read(data, { type: 'buffer' });
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       const html = XLSX.utils.sheet_to_html(worksheet);
