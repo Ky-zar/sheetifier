@@ -105,7 +105,7 @@ export function SheetUploader() {
       filename: `${fileName?.split('.')[0] || 'sheet'}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' },
     };
 
     html2pdf().from(tableRef.current).set(options).save();
