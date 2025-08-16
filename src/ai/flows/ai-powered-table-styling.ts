@@ -35,12 +35,18 @@ const prompt = ai.definePrompt({
   prompt: `You are an AI expert in HTML table styling. Your job is to take an HTML table as input and style it to be more readable and visually appealing.
 
 You should apply the following styling guidelines:
-- Use alternating row colors to improve readability.
-- Adjust column widths to fit the content appropriately.
-- Make font adjustments (size, family) for better aesthetics.
-- use periwinkle as a subtle accent color for headers, rules, or borders.
+- Use a clean, professional, and modern design.
+- The table should have a width of 100%.
+- Apply a subtle box-shadow to the table for depth.
+- Use a light gray border for the table and cells.
+- The header row should have a slightly darker background color and bold text.
+- Use alternating row colors (zebra-striping) for the table body to improve readability.
+- Add padding to cells for spacing.
+- Align text to the left in all cells.
+- Use a common, readable font like Arial or Helvetica.
+- Ensure there is no vertical alignment style applied to cells.
 
-Ensure that the output is valid HTML that includes the <table> tag.
+Ensure that the output is valid HTML that includes the <table> tag and inline CSS styles.
 
 Input HTML Table:
 {{{tableHtml}}}
