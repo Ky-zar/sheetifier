@@ -2,7 +2,6 @@
 
 import { useState, useRef, type DragEvent } from 'react';
 import * as XLSX from 'xlsx';
-import html2pdf from 'html2pdf.js';
 import { Upload, FileSpreadsheet, Download, Loader2, X, RefreshCw } from 'lucide-react';
 
 import { aiPoweredTableStyling } from '@/ai/flows/ai-powered-table-styling';
@@ -96,8 +95,10 @@ export function SheetUploader() {
     }
   };
 
-  const handleDownloadPdf = () => {
+  const handleDownloadPdf = async () => {
     if (!tableRef.current || !styledHtml) return;
+
+    const html2pdf = (await import('html2pdf.js')).default;
 
     const options = {
       margin: [0.5, 0.5, 0.5, 0.5],
