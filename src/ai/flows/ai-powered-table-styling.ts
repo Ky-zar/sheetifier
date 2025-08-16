@@ -32,26 +32,43 @@ const prompt = ai.definePrompt({
   name: 'aiPoweredTableStylingPrompt',
   input: {schema: AIPoweredTableStylingInputSchema},
   output: {schema: AIPoweredTableStylingOutputSchema},
-  prompt: `You are an AI expert in HTML table styling. Your job is to take an HTML table as input and style it to be more readable and visually appealing.
+  prompt: `You are an expert in modern and accessible HTML table styling. Your task is to take a raw HTML table and apply inline CSS to make it clean, professional, and highly readable.
 
-You should apply the following styling guidelines:
-- Use a clean, professional, and modern design.
-- The table should have a width of 100%.
-- Apply a subtle box-shadow to the table for depth.
-- Use a light gray border for the table and cells.
-- The header row should have a slightly darker background color and bold text.
-- Use alternating row colors (zebra-striping) for the table body to improve readability.
-- Add padding to cells for spacing.
-- Align text to the left in all cells.
-- Use a common, readable font like Arial or Helvetica.
-- Ensure there is no vertical alignment style applied to cells.
+**Styling & Accessibility Requirements:**
 
-Ensure that the output is valid HTML that includes the <table> tag and inline CSS styles.
+1.  **Overall Table:**
+    *   Set \`width: 100%;\` and \`border-collapse: collapse;\`.
+    *   Apply a subtle shadow for depth: \`box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);\`.
+    *   Use a common, readable sans-serif font like 'Inter', 'Helvetica', or 'Arial'.
+    *   Round the corners of the table container if possible, or ensure the final presentation appears in a rounded container.
 
-Input HTML Table:
+2.  **Headers (\`<th>\`):**
+    *   Set background color to a light gray (\`#f8f9fa\`).
+    *   Text should be bold (\`font-weight: 600;\`) and aligned to the left.
+    *   Add ample padding: \`padding: 12px 15px;\`.
+    *   Add a bottom border: \`border-bottom: 2px solid #dee2e6;\`.
+    *   **Crucially for accessibility, add the \`scope="col"\` attribute to each \`<th>\` element.**
+
+3.  **Cells (\`<td>\`):**
+    *   Add padding for spacing: \`padding: 12px 15px;\`.
+    *   Align text to the left.
+    *   Add a subtle border between rows: \`border-bottom: 1px solid #e9ecef;\`.
+
+4.  **Rows (\`<tr>\`):**
+    *   Implement zebra-striping for readability. Use \`#ffffff\` for odd rows and a very light gray (\`#f8f9fa\`) for even rows using the \`:nth-child(even)\` selector in a style block if necessary, or apply styles directly.
+    *   Ensure there are no vertical borders between cells.
+    *   Make sure the last row in the \`<tbody>\` does not have a bottom border.
+
+5.  **Final Output:**
+    *   Return ONLY the complete, valid HTML for the styled table, starting with \`<table>\` and ending with \`</table>\`.
+    *   All styles must be inline CSS applied directly to the elements. Do not use \`<style>\` blocks unless absolutely necessary for pseudo-selectors.
+
+**Input HTML Table:**
+\`\`\`html
 {{{tableHtml}}}
+\`\`\`
 
-Output styled HTML Table:`,
+**Output Styled and Accessible HTML Table:**`,
 });
 
 const aiPoweredTableStylingFlow = ai.defineFlow(

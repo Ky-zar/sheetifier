@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, type DragEvent } from 'react';
 import * as XLSX from 'xlsx';
-import { Upload, FileSpreadsheet, Download, Loader2, X, RefreshCw, Trash2, History } from 'lucide-react';
+import { Upload, FileSpreadsheet, Download, Loader2, History, Trash2, RefreshCw } from 'lucide-react';
 
 import { aiPoweredTableStyling } from '@/ai/flows/ai-powered-table-styling';
 import { Button } from '@/components/ui/button';
@@ -43,7 +43,7 @@ export function SheetUploader() {
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
     };
-    const updatedProjects = [newProject, ...savedProjects];
+    const updatedProjects = [newProject, ...savedProjects.slice(0, 9)];
     setSavedProjects(updatedProjects);
     localStorage.setItem('sheetifier-projects', JSON.stringify(updatedProjects));
   };
@@ -52,16 +52,19 @@ export function SheetUploader() {
     const updatedProjects = savedProjects.filter(p => p.id !== id);
     setSavedProjects(updatedProjects);
     localStorage.setItem('sheetifier-projects', JSON.stringify(updatedProjects));
+    toast({ title: 'Project deleted', description: 'The styled sheet has been removed from your history.' });
   };
   
   const clearProjects = () => {
     setSavedProjects([]);
     localStorage.removeItem('sheetifier-projects');
+    toast({ title: 'History cleared', description: 'All saved projects have been deleted.' });
   };
 
   const loadProject = (project: SavedProject) => {
     setFileName(project.fileName);
     setStyledHtml(project.styledHtml);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   const handleFile = async (file: File) => {
@@ -168,19 +171,19 @@ export function SheetUploader() {
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <Card className="w-full max-w-4xl mx-auto transition-all duration-300">
+    <div className="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pb-10">
+      <Card className="w-full mx-auto transition-all duration-300 shadow-lg">
         {!styledHtml && !isLoading && (
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-headline">Upload Your Spreadsheet</CardTitle>
-            <CardDescription>Drag & drop or click to upload a .xlsx or .csv file.</CardDescription>
+          <CardHeader className="text-center p-8">
+            <CardTitle className="text-3xl font-bold">Start Here</CardTitle>
+            <CardDescription className="text-md">Drag & drop or click to upload your spreadsheet.</CardDescription>
           </CardHeader>
         )}
         <CardContent className="p-6">
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center h-64 gap-4">
+            <div className="flex flex-col items-center justify-center h-80 gap-4" role="status" aria-live="polite">
               <Loader2 className="h-12 w-12 animate-spin text-primary" />
-              <p className="text-muted-foreground">AI is styling your table...</p>
+              <p className="text-muted-foreground text-lg">AI is working its magic...</p>
             </div>
           ) : !styledHtml ? (
             <div
@@ -191,29 +194,34 @@ export function SheetUploader() {
               onClick={() => fileInputRef.current?.click()}
               className={cn(
                 "flex flex-col items-center justify-center p-12 border-2 border-dashed rounded-lg cursor-pointer transition-colors duration-300",
-                isDragging ? "border-primary bg-accent/50" : "border-border hover:border-primary/80 hover:bg-accent/30"
+                isDragging ? "border-primary bg-accent/20" : "border-border hover:border-primary/80 hover:bg-accent/10"
               )}
+              role="button"
+              tabIndex={0}
+              aria-label="File upload area"
             >
               <Upload className="h-12 w-12 text-muted-foreground" />
               <p className="mt-4 text-center text-muted-foreground">
                 <span className="font-semibold text-primary">Click to upload</span> or drag and drop
               </p>
+              <p className="text-xs text-muted-foreground mt-2">.xlsx or .csv files supported</p>
               <input
                 ref={fileInputRef}
                 type="file"
                 className="hidden"
-                accept=".xlsx, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
                 onChange={onFileChange}
+                aria-hidden="true"
               />
             </div>
           ) : (
             <div>
               <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3">
-                  <FileSpreadsheet className="h-6 w-6 text-primary" />
-                  <span className="font-medium">{fileName}</span>
+                  <FileSpreadsheet className="h-7 w-7 text-primary" />
+                  <span className="font-semibold text-lg">{fileName}</span>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                   <Button onClick={resetState} variant="outline">
                     <RefreshCw className="mr-2 h-4 w-4" />
                     New File
@@ -224,7 +232,7 @@ export function SheetUploader() {
                   </Button>
                 </div>
               </div>
-              <div className="overflow-x-auto border rounded-lg bg-white dark:bg-card">
+              <div className="overflow-x-auto border rounded-lg bg-card">
                  <div ref={tableRef} className="p-1" dangerouslySetInnerHTML={{ __html: styledHtml }} />
               </div>
             </div>
@@ -233,43 +241,39 @@ export function SheetUploader() {
       </Card>
       
       {savedProjects.length > 0 && !styledHtml && (
-      <Card className="w-full max-w-4xl mx-auto mt-8">
-        <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <History className="h-6 w-6" />
-                <CardTitle className="text-xl font-headline">History</CardTitle>
+        <div className="mt-12">
+            <div className="flex flex-col sm:flex-row items-center justify-between mb-4 gap-4">
+              <div className="flex items-center gap-3">
+                <History className="h-7 w-7" />
+                <h3 className="text-2xl font-bold">Your History</h3>
               </div>
+              {savedProjects.length > 1 && (
                 <Button variant="destructive" size="sm" onClick={clearProjects}>
                     <Trash2 className="mr-2 h-4 w-4" />
                     Clear History
                 </Button>
+              )}
             </div>
-          <CardDescription>View or manage your previously styled sheets.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {savedProjects.map((project) => (
-              <div key={project.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                <div>
-                  <p className="font-medium">{project.fileName}</p>
-                  <p className="text-sm text-muted-foreground">
-                    Styled on {new Date(project.createdAt).toLocaleString()}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => loadProject(project)}>View</Button>
-                    <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600" onClick={() => deleteProject(project.id)}>
-                        <Trash2 className="h-4 w-4" />
-                    </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {savedProjects.map((project) => (
+                <Card key={project.id} className="flex flex-col justify-between">
+                  <CardHeader>
+                    <CardTitle className="text-lg truncate">{project.fileName}</CardTitle>
+                    <CardDescription>
+                      {new Date(project.createdAt).toLocaleString()}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex gap-2 pt-4">
+                      <Button className="w-full" variant="outline" size="sm" onClick={() => loadProject(project)}>View</Button>
+                      <Button variant="ghost" size="icon" aria-label="Delete project" className="text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => deleteProject(project.id)}>
+                          <Trash2 className="h-4 w-4" />
+                      </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+        </div>
       )}
-
     </div>
   );
 }
